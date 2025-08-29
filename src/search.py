@@ -25,5 +25,5 @@ PERGUNTA DO USUÁRIO:
 RESPONDA A "PERGUNTA DO USUÁRIO"
 """
 
-def search_prompt():
-    pass
+def search_prompt() -> str:
+  return PROMPT_TEMPLATE
