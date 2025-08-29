@@ -2,13 +2,13 @@ import os
 from search import search_prompt
 from dotenv import load_dotenv
 from langchain.prompts import PromptTemplate
-from langchain_google_genai import GoogleGenerativeAIEmbeddings
-from langchain.chat_models import init_chat_model
+from langchain_openai import OpenAIEmbeddings
+from langchain_openai import ChatOpenAI
 from langchain_postgres import PGVector
 from langchain_core.output_parsers import StrOutputParser
 
 load_dotenv()
-for k in ("LLM_API_KEY","PG_VECTOR_COLLECTION_NAME", "DATABASE_URL"):
+for k in ("OPENAI_EMBEDDING_MODEL","OPENAI_API_KEY","PG_VECTOR_COLLECTION_NAME", "DATABASE_URL"):
     if not os.getenv(k):
         raise RuntimeError(f"Environment variable {k} is not set")
     
@@ -16,7 +16,7 @@ def main():
     template = getTemplateChain()
     store = getEmbeddingsStored()
 
-    llm = init_chat_model(model="gemini-2.5-flash-lite", model_provider="google_genai", temperature=0, google_api_key=os.getenv("LLM_API_KEY"))
+    llm = ChatOpenAI(model="gpt-5-nano", temperature=0)
     pipeline = template | llm | StrOutputParser()
 
     print("Faça sua pergunta: (ou 'sair' para encerrar):")
@@ -47,7 +47,7 @@ def getTemplateChain():
     return template
 
 def getEmbeddingsStored():
-    embeddings = GoogleGenerativeAIEmbeddings(model="gemini-embedding-001", google_api_key=os.getenv("LLM_API_KEY"))
+    embeddings = OpenAIEmbeddings(model=os.getenv("OPENAI_EMBEDDING_MODEL"))
 
     store = PGVector(
         embeddings=embeddings,
